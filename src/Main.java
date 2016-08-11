@@ -18,12 +18,15 @@ public class Main extends Application {
         Controller controller = fxmlLoader.getController();
 
         Scene scene = new Scene(root);
+
+        // Handling key pressure
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 controller.keyPressed(event);
             }
         });
+
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

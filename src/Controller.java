@@ -16,7 +16,8 @@ import java.util.concurrent.Callable;
 
 public class Controller {
 
-    private Robot robot;
+    private KeyEvent key = null; // Listened key
+    private Robot robot; // Robot for keys or mouse pressure simulation
 
     @FXML
     private TextField tfMouseTimeBeforeStart;
@@ -51,8 +52,7 @@ public class Controller {
     @FXML
     private CheckBox chkAlt;
 
-    private KeyEvent key = null;
-
+    // Initialisation of the scene
     @FXML
     private void initialize() {
         try {
@@ -79,6 +79,7 @@ public class Controller {
     private Timeline generateKeyClicks() {
         double timeBetweenKeyClick = Double.valueOf(tfKeyTimeBetweenPress.getText());
 
+        // Handling of ctrl, shift and alt keys
         List<Integer> extraKeyCodes = new ArrayList<>();
         if(chkCtrl.isSelected()) extraKeyCodes.add(java.awt.event.KeyEvent.VK_CONTROL);
         if(chkAlt.isSelected()) extraKeyCodes.add(java.awt.event.KeyEvent.VK_ALT);
@@ -93,11 +94,13 @@ public class Controller {
                     robot.keyRelease(key.getCode().impl_getCode());
                 }
         ));
+
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
         return timeline;
     }
 
+    // Time before an action
     private void waiting(double seconds, Callable<Timeline> callback){
         Timeline timeline = new Timeline(new KeyFrame(
                 Duration.seconds(seconds),
@@ -112,6 +115,18 @@ public class Controller {
         timeline.play();
     }
 
+    // Called when an user pressed a key on the scene
+    public void keyPressed(KeyEvent keyEvent) {
+        if(btnKeyListening.isDisabled()){
+            key = keyEvent;
+            Platform.runLater(() -> {
+                lblKey.setText(keyEvent.getCode().getName());
+                btnKeyListening.setDisable(false);
+            });
+        }
+    }
+
+    // Click on start button
     @FXML
     private void handleStart() {
         if(chkMousePress.isSelected()) {
@@ -124,6 +139,7 @@ public class Controller {
         }
     }
 
+    // Click on listening button
     @FXML
     private void clickKeyListening() {
         Platform.runLater(() -> {
@@ -132,16 +148,7 @@ public class Controller {
         });
     }
 
-    public void keyPressed(KeyEvent keyEvent) {
-        if(btnKeyListening.isDisabled()){
-            key = keyEvent;
-            Platform.runLater(() -> {
-                lblKey.setText(keyEvent.getCode().getName());
-                btnKeyListening.setDisable(false);
-            });
-        }
-    }
-
+    // Click on about menu item
     @FXML
     private void clickAbout() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
